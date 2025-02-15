@@ -98,6 +98,7 @@ const PianoRoll: React.FC = () => {
               active:bg-blue-100 active:shadow-inner
               flex flex-col items-center justify-center
               transition-all duration-100
+              select-none touch-none
               ${isRecording ? 'ring-2 ring-red-500 ring-offset-2' : ''}
               ${activeNoteRef.current === note ? 'bg-blue-100 shadow-inner scale-95' : ''}
               ${currentPlayingPitch === note ? 'bg-blue-200 shadow-lg scale-105 ring-2 ring-blue-400 ring-offset-2' : ''}
@@ -106,11 +107,32 @@ const PianoRoll: React.FC = () => {
               e.preventDefault();
               handleNoteStart(note);
             }}
-            onTouchEnd={() => handleNoteEnd()}
-            onTouchCancel={() => handleNoteEnd()}
-            onMouseDown={() => handleNoteStart(note)}
-            onMouseUp={() => handleNoteEnd()}
-            onMouseLeave={() => activeNoteRef.current === note && handleNoteEnd()}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              handleNoteEnd();
+            }}
+            onTouchCancel={(e) => {
+              e.preventDefault();
+              handleNoteEnd();
+            }}
+            onPointerDown={(e) => {
+              if (e.pointerType === 'touch') {
+                e.preventDefault();
+              }
+              handleNoteStart(note);
+            }}
+            onPointerUp={(e) => {
+              if (e.pointerType === 'touch') {
+                e.preventDefault();
+              }
+              handleNoteEnd();
+            }}
+            onPointerLeave={(e) => {
+              if (e.pointerType === 'touch') {
+                e.preventDefault();
+              }
+              activeNoteRef.current === note && handleNoteEnd();
+            }}
           >
             <span className="text-2xl font-bold text-gray-800">{note.replace(/\d+/, '')}</span>
             <span className="text-sm text-gray-500">{note.match(/\d+/)?.[0]}</span>
